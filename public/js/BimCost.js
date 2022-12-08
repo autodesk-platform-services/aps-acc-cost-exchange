@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////
 // Copyright (c) Autodesk, Inc. All rights reserved
-// Written by Forge Partner Development
+// Written by Autodesk Partner Development
 //
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
@@ -146,7 +146,7 @@ class CostTable {
   async fetchDataOfCurrentDataTypeAsync() {
     this.dataSet = [];
     try {
-      const requestUrl = '/api/forge/cost/info';
+      const requestUrl = '/api/aps/cost/info';
       const requetData = {
         'costContainerId': this.costContainerId,
         'costType': this.currentDataType
@@ -499,7 +499,7 @@ class CostTable {
       console.log('input parameters is not valid.');
       return;
     }
-    const requestUrl = '/api/forge/bim360/type/' + encodeURIComponent(propertyName) + '/id/' + encodeURIComponent(propertyId);
+    const requestUrl = '/api/aps/bim360/type/' + encodeURIComponent(propertyName) + '/id/' + encodeURIComponent(propertyId);
     const requestData = {
       'projectHref': this.projectHref,
       'costContainerId': this.costContainerId
@@ -518,7 +518,7 @@ class CostTable {
   // protected: update the cost entity info
   async updateEntityInfo(requestData) {
     try{
-      const requestUrl = '/api/forge/cost/info';
+      const requestUrl = '/api/aps/cost/info';
       const requestBody = {
         'projectHref': this.projectHref,
         'costContainerId': this.costContainerId,
@@ -567,7 +567,7 @@ class CostTable {
         'value': propertyValue
       }]
     };  
-    return await apiClientAsync( '/api/forge/cost/attribute', requestBody, 'post');
+    return await apiClientAsync( '/api/aps/cost/attribute', requestBody, 'post');
   }
 
 

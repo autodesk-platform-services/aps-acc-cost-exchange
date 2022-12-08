@@ -1,24 +1,25 @@
 {
-  "name": "forge-bim360.costmanagement.exchange.csv",
-  "description": "BIM 360 Cost API exchange sample",
-  "repository": "https://github.com/Autodesk-Forge/forge-bim360.costmanagement.exchange.csv",
-  "logo": "https://avatars0.githubusercontent.com/u/8017462?v=3&s=200",
+  "name": "aps-acc-cost-exchange",
+  "description": "ACC Cost exchange sample",
+  "repository": "https://github.com/autodesk-platform-services/aps-acc-cost-exchange",
+  "logo": "https://cdn.autodesk.io/logo/black/logo.png",
   "keywords": [
       "autodesk",
-      "forge",
+      "aps",
       "bim360",
+      "acc",
       "cost"
   ],
   "env": {
-      "FORGE_CLIENT_ID": {
-          "description": "Forge Client ID"
+      "APS_CLIENT_ID": {
+          "description": "APS Client ID"
       },
-      "FORGE_CLIENT_SECRET": {
-          "description": "Forge Client Secret"
+      "APS_CLIENT_SECRET": {
+          "description": "APS Client Secret"
       },
-      "FORGE_CALLBACK_URL": {
-        "description": "Callback URL of your Forge app, required for 3-legged OAuth",
-        "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/forge/callback/oauth"
+      "APS_CALLBACK_URL": {
+        "description": "Callback URL of your APS app, required for 3-legged OAuth",
+        "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/aps/callback/oauth"
      }
   },
   "website": "https://developer.autodesk.com/",
