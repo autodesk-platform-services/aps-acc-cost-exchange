@@ -26,7 +26,8 @@ if (!String.prototype.replaceAll) {
 }
 
 // the cost table instance
-var costTable = null
+var g_costTable = null;
+var g_costEventsTable = null;
 
 // the following 2 strings will be used to replace ',' and '\n'
 const Enter_Replacement = '\xfe';
@@ -125,6 +126,100 @@ const IdProperties = {
 };
 
 
+
+const SocketEnum = {
+  COST_EVENTS: 'cost events'
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//socket host 
+const HOST_URL = window.location.host;
+var socketio = io.connect('http://' + HOST_URL);
+socketio.on(SocketEnum.COST_EVENTS, async (data) => {
+  // If receive any changes to the cost object, mark the title as updated
+  let costControl = null;
+  switch (data.CostObject) {
+    case CostDataType.BUDGET:
+      costControl = $('#budgetText')[0]
+      break;
+    case CostDataType.CONTRACT:
+      costControl = $('#contractText')[0]
+      break;
+    case CostDataType.CHANGE_ORDER:
+    case CostDataType.PCO:
+    case CostDataType.OCO:
+    case CostDataType.RCO:
+    case CostDataType.RFQ:
+    case CostDataType.SCO:
+      costControl = $('#changeorderText')[0]
+      break;
+  }
+  if( costControl != null )
+    costControl.textContent += '*'
+})
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Cost Events Table
+class CostEventsTable{
+
+  constructor(tableId, projectId, dataSet = []) {
+    this.tableId = tableId;
+    this.projectId = projectId;
+    this.dataSet = dataSet;
+    this.columns = [
+      { field: 'hookId', title: "ID", align: 'center' },
+      { field: 'event', title: "Event", align: 'center' },
+      { field: 'status', title: "Status", align: 'center' },
+      { field: 'callbackUrl', title: "Callback URL", align: 'center' }
+    ]
+  }
+
+  async fetchCostWebHooks() {
+    let hooks = null;
+    try {
+      const requestUrl = '/api/aps/project/' + encodeURIComponent(this.projectId) + '/cost/events';
+      hooks = await apiClientAsync(requestUrl);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to get the Webhook Events for this project!")
+      return;
+    }
+    this.dataSet = hooks.map(item => {
+      return {
+        hookId: item.hookId,
+        event: item.event,
+        status: item.status,
+        callbackUrl: item.callbackUrl
+      };
+    })
+    // this.dataSet.sort();
+  }
+
+  drawTable(){
+    $(this.tableId).bootstrapTable('destroy');
+    $(this.tableId).bootstrapTable({
+      data: this.dataSet,
+      editable: true,
+      clickToSelect: true,
+      cache: false,
+      showToggle: false,
+      showPaginationSwitch: true,
+      pagination: true,
+      pageList: [5, 10, 25, 50, 100],
+      pageSize: 10,
+      pageNumber: 1,
+      uniqueId: 'id',
+      striped: true,
+      search: true,
+      showRefresh: true,
+      minimumCountColumns: 2,
+      smartDisplay: true,
+      columns: this.columns
+    });
+  }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Cost Table class that manage the operation to the table
 class CostTable {
@@ -219,7 +314,7 @@ class CostTable {
   };
 
   // draw the cost table based on the current data
-  drawCostTable() {
+  drawTable() {
     let columns = [];
     if (this.dataSet.length !== 0) {
       for (var key in this.dataSet[0]) {
@@ -628,11 +723,11 @@ $(document).ready(function () {
     exporting = $('input[name="exportOrImport"]:checked').val() === 'export';
     // Export the current table
     if (exporting) {
-      if( !costTable || !costTable.csvData ){
+      if( !g_costTable || !g_costTable.csvData ){
         alert('Please get the data first.')
         return;
       }
-      costTable.exportCSV();
+      g_costTable.exportCSV();
     } else {
       // Import data from selected CSV file
       var fileUpload = document.getElementById("inputFile");
@@ -641,7 +736,7 @@ $(document).ready(function () {
         if (typeof (FileReader) != "undefined") {
           var reader = new FileReader();
           reader.onload = async function (e) {
-            if(!costTable) {
+            if(!g_costTable) {
               alert('please select one project!');
               return;
             }
@@ -666,7 +761,7 @@ $(document).ready(function () {
                     jsonData[newKey] = cells[j];
                     continue;
                   }
-                  const typeSupported = isTypeSupported(newKey, costTable.CurrentDataType);
+                  const typeSupported = isTypeSupported(newKey, g_costTable.CurrentDataType);
                   if (typeSupported === TypeSupported.STRING) {
                     jsonData[newKey] = cells[j];
                     continue;
@@ -680,7 +775,7 @@ $(document).ready(function () {
                     const params = newKey.split(':');
                     try {
                       // TBD: interesting, it always add '\r' at the end of the string, workaround for now.
-                      await costTable.updateCustomAttribute( jsonData['id'], params[params.length - 1].split('\r').join(''), cells[j].split('\r').join(''));
+                      await g_costTable.updateCustomAttribute( jsonData['id'], params[params.length - 1].split('\r').join(''), cells[j].split('\r').join(''));
                     } catch (err) {
                       console.log('Failed to update custom attribute ' + params[params.length - 2] + ' : ' + cells[j]);
                     }
@@ -688,7 +783,7 @@ $(document).ready(function () {
                 }
               }
               try {
-                await costTable.updateEntityInfo(jsonData);
+                await g_costTable.updateEntityInfo(jsonData);
               } catch (err) {
                 console.log(err);
               }
@@ -723,27 +818,50 @@ $(document).ready(function () {
     // get the active tab
     const activeTab = $("ul#costTableTabs li.active").children()[0].hash;
     switch( activeTab ){
+      case '#costEvents':{
+        if( g_costEventsTable == null ){
+          const params = projectHref.split('/');
+          const projectId = params[params.length - 1].replace('b.', '');
+          g_costEventsTable = new CostEventsTable( '#costEventsTable',projectId );
+        }
+        try{
+          await g_costEventsTable.fetchCostWebHooks();
+          g_costEventsTable.drawTable();
+        }catch(err){
+          console.log(err);
+        }
+        $('.clsInProgress').hide();
+        $('.clsResult').show();
+        return;
+      }
       case '#budget':{
-        costTable.CurrentDataType = CostDataType.BUDGET;
+        g_costTable.CurrentDataType = CostDataType.BUDGET;
         break;
       }
       case '#contract':{
-        costTable.CurrentDataType = CostDataType.CONTRACT;
+        g_costTable.CurrentDataType = CostDataType.CONTRACT;
         break;
       }
       case '#changeorder':{
-        costTable.CurrentDataType = $('input[name="order_type"]:checked').val();
+        g_costTable.CurrentDataType = $('input[name="order_type"]:checked').val();
         break;
       }
     }
 
-    costTable.IsHumanReadable = $('input[name="dataTypeToDisplay"]:checked').val() === 'humanReadable';
+    g_costTable.IsHumanReadable = $('input[name="dataTypeToDisplay"]:checked').val() === 'humanReadable';
     try{
-      await costTable.fetchDataOfCurrentDataTypeAsync();
-      await costTable.polishDataOfCurrentDataTypeAsync();
-      costTable.drawCostTable();  
+      await g_costTable.fetchDataOfCurrentDataTypeAsync();
+      await g_costTable.polishDataOfCurrentDataTypeAsync();
+      g_costTable.drawTable();  
     }catch(err){
       console.log(err);
+    }
+
+    // Remode the modified mark
+    let activeControl = $("ul#costTableTabs li.active").children()[0]
+    if (activeControl && activeControl.childElementCount != 0) {
+      let textControl = activeControl.children[0]
+      textControl.textContent = textControl.textContent.replace('*', '')
     }
 
     $('.clsInProgress').hide();
@@ -755,6 +873,10 @@ $(document).ready(function () {
   })
 
   $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    // Disable the Refresh and Execute button for the Events Tab.
+    $('#btnRefresh')[0].disabled = (e.target.hash == '#costEvents');
+    $('#executeCSV')[0].disabled = (e.target.hash == '#costEvents');
+
     $('#btnRefresh').click();
   });
 });

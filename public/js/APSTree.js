@@ -93,6 +93,7 @@ function prepareUserHubsTree() {
           '#': { 'icon': 'glyphicon glyphicon-user' },
           'bim360Hubs': { 'icon': 'https://cdn.autodesk.io/dm/xs/bim360hub.png' },
           'bim360projects': { 'icon': 'https://cdn.autodesk.io/dm/xs/bim360project.png' },
+          'accprojects': { 'icon': 'https://cdn.autodesk.io/dm/xs/bim360project.png' },
           'unsupported': { 'icon': 'glyphicon glyphicon-ban-circle' }
       },
       "sort": function (a, b) {
@@ -107,23 +108,137 @@ function prepareUserHubsTree() {
           else if (a1.type !== b1.type) return a1.icon < b1.icon ? 1 : -1; // types are different inside folder, so sort by icon (files/folders)
           else return a1.text > b1.text ? 1 : -1; // basic name/text sort
       },
-      "plugins": ["types", "state", "sort"],
+      "plugins": ["types", "state", "sort", "contextmenu"],
+      contextmenu: { items: autodeskMenuSource },
       "state": { "key": "sourceHubs" }// key restore tree state
   }).on('select_node.jstree', function(evt, data){
-    if (data != null && data.node != null && (data.node.type == 'bim360projects' )) {
+    if (data != null && data.node != null && (data.node.type == 'bim360projects' || data.node.type == 'accprojects' ) ) {
       $('#labelProjectHref').text(data.node.id);
       $('#labelCostContainer').text(data.node.original.cost_container);
 
       // create the cost table when project is selected.
-      if( costTable != null ){
-        delete costTable;
-        costTable = null;
+      if( g_costTable != null ){
+        delete g_costTable;
+        g_costTable = null;
       }
-      costTable = new CostTable('#budgetsTable', data.node.original.cost_container, data.node.id, CostDataType.BUDGET);
+      g_costTable = new CostTable('#budgetsTable', data.node.original.cost_container, data.node.id, CostDataType.BUDGET);
+
+      if( g_costEventsTable != null ){
+        delete g_costEventsTable;
+        g_costEventsTable = null;
+      }   
+      const params = data.node.id.split('/');
+      const projectId = params[params.length - 1].replace('b.', '');
+      g_costEventsTable = new CostEventsTable('#costEventsTable', projectId);
+
       $('#btnRefresh').click();
     }
   }); 
 }
+
+
+
+/////////////////////////////////////////////////////////////
+// Context menu for the project node
+function autodeskMenuSource(autodeskNode) {
+  var items;
+
+  switch (autodeskNode.type) {
+    case "bim360projects":
+    case "accprojects":
+      items = {
+        registerEvents: {
+          label: "Register cost webhook events",
+          action: function () {
+            registerEvents(autodeskNode);
+          },
+          icon: 'glyphicon glyphicon-registration-mark'
+        },
+        unregisterEvents:{
+          label: "Unregister cost webhook events",
+          action: function () {
+            unregisterEvents(autodeskNode);
+          },
+          icon: 'glyphicon glyphicon-remove-circle'
+        }
+      };
+      break;
+  }
+  return items;
+}
+
+//////////////////////////////////////////////////////
+// Register the webhook events for all cost objects
+async function registerEvents( node ){
+  if (node == null) {
+    console.log('selected node is not correct.');
+    return;
+  }
+
+  const params = node.id.split('/');
+  if (params.length == 0) {
+    console.log('the node id is not correct');
+    return;
+  }
+
+  const activeTabText = $("ul#costTableTabs li.active").children()[0].hash;
+  if(activeTabText == '#costEvents'){
+    $('.clsInProgress').show();
+    $('.clsResult').hide();
+  }
+
+  const projectId = params[params.length - 1];
+  try{
+    const requestUrl = '/api/aps/project/' + encodeURIComponent(projectId) + '/cost/events';
+    await apiClientAsync( requestUrl, {}, "post");
+  }catch(err){
+    console.error(err);
+    alert("Failed to register the Webhook Events for Cost Objects!")
+    return null;
+  }
+  if(activeTabText == '#costEvents'){
+    await $('#btnRefresh').click();
+  }
+  alert("The Webhook Events for Cost Objects are registered!")  
+}
+
+
+//////////////////////////////////////////////////////
+// Unregister the webhook events for all cost objects
+async function unregisterEvents(node) {
+  if (node == null) {
+    console.log('selected node is not correct.');
+    return;
+  }
+
+  const params = node.id.split('/');
+  if (params.length == 0) {
+    console.log('the node id is not correct');
+    return;
+  }
+
+  const activeTabText = $("ul#costTableTabs li.active").children()[0].hash;
+  if(activeTabText == '#costEvents'){
+    $('.clsInProgress').show();
+    $('.clsResult').hide();
+  }
+
+  const projectId = params[params.length - 1];
+  try {
+    const requestUrl = '/api/aps/project/' + encodeURIComponent(projectId) + '/cost/events';
+    await apiClientAsync(requestUrl, {}, "delete");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to unregister the Webhook Events for Cost Objects!")
+    return null;
+  }
+  
+  if(activeTabText == '#costEvents'){
+    await $('#btnRefresh').click();
+  }
+  alert("The Webhook Events for Cost Objects are unregistered!")
+}
+
 
 function showUser() {
   jQuery.ajax({

@@ -21,7 +21,9 @@ module.exports = {
     credentials: {
         client_id: process.env.APS_CLIENT_ID,
         client_secret: process.env.APS_CLIENT_SECRET,
-        callback_url: process.env.APS_CALLBACK_URL
+        callback_url: process.env.APS_CALLBACK_URL,
+        callback_cost_events: process.env.APS_CALLBACK_COST_EVENTS
+
     },
     scopes: {
         // Required scopes for the server-side application
@@ -54,7 +56,12 @@ module.exports = {
             CHANGEORDERS_URL:   "https://developer.api.autodesk.com/cost/v1/containers/{0}/change-orders/{1}?include=attributes",
             CHANGEORDER_URL:    "https://developer.api.autodesk.com/cost/v1/containers/{0}/change-orders/{1}/{2}",
         
-            CUSTOM_ATTRIBUTE_URL: "https://developer.api.autodesk.com/cost/v1/containers/{0}/property-values:batch-update"
+            CUSTOM_ATTRIBUTE_URL: "https://developer.api.autodesk.com/cost/v1/containers/{0}/property-values:batch-update",
+
+            COST_EVENTS_HOOKS:    "https://developer.api.autodesk.com/webhooks/v1/systems/{0}/events/{1}/hooks",
+            COST_EVENTS_HOOK:     "https://developer.api.autodesk.com/webhooks/v1/systems/{0}/events/{1}/hooks/{2}",
+            COST_HOOKS:           "https://developer.api.autodesk.com/webhooks/v1/systems/{0}/hooks"
+
         }
     },
     

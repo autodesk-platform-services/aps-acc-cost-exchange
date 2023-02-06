@@ -30,6 +30,31 @@ const { apiClientCallAsync } = require('./common/apiclient');
 const { OAuth } = require('./common/oauth');
 
 
+const SocketEnum = {
+  COST_EVENTS: 'cost events'
+};
+
+const CostEventObjects =[
+'budget',
+'budgetPayment',
+'contract',
+'cor',
+'costPayment',
+'expense',
+'expenseItem',
+'mainContract',
+'mainContractItem',
+'oco',
+'pco',
+'rfq',
+'scheduleOfValue',
+'sco'
+]
+
+const CostEventVersion = "-1.0";
+const CostEventSystemId = "autodesk.construction.cost";
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Add String.format() method if it's not existing
 if (!String.prototype.format) {
@@ -297,6 +322,135 @@ router.post('/cost/attribute',jsonParser, async function (req, res) {
     }));
   }
   res.status(200).json(costInfoRes.body);
+})
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// Get cost webhook events
+/////////////////////////////////////////////////////////////////////////////////////////////
+router.get('/project/:projectId/cost/events', jsonParser, async function (req, res) {
+  const projectId = req.params.projectId;
+  if (!projectId) {
+    console.error('Project id is not provided.');
+    return (res.status(400).json({
+      diagnostic: 'Project id is not provided.'
+    }));
+  }
+
+  const projectIdWithoutB = projectId.replace("b.", "");
+  const costEventsUrl = config.bim360Cost.URL.COST_HOOKS.format(CostEventSystemId);
+  try {
+    const webHooks = await apiClientCallAsync("GET", costEventsUrl, req.oauth_token.access_token);
+    const projectHooks = webHooks.body.data.filter(node => node.scope.project == projectIdWithoutB)
+    res.status(200).json(projectHooks);
+  } catch (err) {
+    console.error(err)
+    return (res.status(500).json({
+      diagnostic: 'failed to unregister cost webhooks'
+    }));
+  }
+})
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// Create cost webhook events
+/////////////////////////////////////////////////////////////////////////////////////////////
+router.post('/project/:projectId/cost/events', jsonParser, async function (req, res) {
+  const projectId = req.params.projectId;
+  if (!projectId) {
+    console.error('Project id is not provided.');
+    return (res.status(400).json({
+      diagnostic: 'Project id is not provided.'
+    }));
+  }
+  const projectIdWithoutB = projectId.replace("b.", "");
+  await Promise.all(CostEventObjects.map(async costObject => {
+    const costObjectCreatedUrl = config.bim360Cost.URL.COST_EVENTS_HOOKS.format(CostEventSystemId, costObject + '.created' + CostEventVersion);
+    const costObjectDeletedUrl = config.bim360Cost.URL.COST_EVENTS_HOOKS.format(CostEventSystemId, costObject + '.deleted' + CostEventVersion);
+    const costObjectUpdatedUrl = config.bim360Cost.URL.COST_EVENTS_HOOKS.format(CostEventSystemId, costObject + '.updated' + CostEventVersion);
+    const requestBody = {
+      'callbackUrl': config.credentials.callback_cost_events,
+      'scope': {
+        'project': projectIdWithoutB
+      }
+    }
+    try {
+      await apiClientCallAsync('POST', costObjectCreatedUrl, req.oauth_token.access_token, requestBody);
+      await apiClientCallAsync('POST', costObjectDeletedUrl, req.oauth_token.access_token, requestBody);
+      await apiClientCallAsync('POST', costObjectUpdatedUrl, req.oauth_token.access_token, requestBody);
+    } catch (err) {
+      console.error('failed to create cost webhook of ' + costObject);
+    }
+  })
+  )  
+  res.status(201).json({ status: 201 });
+})
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// Unregister cost webhook events
+/////////////////////////////////////////////////////////////////////////////////////////////
+router.delete('/project/:projectId/cost/events', jsonParser, async function (req, res) {
+  const projectId = req.params.projectId;
+  if (!projectId) {
+    console.error('Project id is not provided.');
+    return (res.status(400).json({
+      diagnostic: 'Project id is not provided.'
+    }));
+  }  
+  
+  const projectIdWithoutB = projectId.replace("b.","");
+  const costEventsUrl = config.bim360Cost.URL.COST_HOOKS.format( CostEventSystemId);
+  try{
+    const webHooks = await apiClientCallAsync("GET", costEventsUrl, req.oauth_token.access_token );
+    await Promise.all(
+      webHooks.body.data.map( async (hook) => {
+        if( hook.scope.project != projectIdWithoutB)
+          return null;
+        try{
+          const hookUrl = config.bim360Cost.URL.COST_EVENTS_HOOK.format(CostEventSystemId,hook.event, hook.hookId)
+          await apiClientCallAsync("DELETE", hookUrl, req.oauth_token.access_token);
+        }catch(err){
+          console.log(err);
+        }
+      })
+    )
+  } catch (err) {
+    console.error(err)
+    return (res.status(500).json({
+      diagnostic: 'failed to unregister cost webhooks'
+    }));
+  }
+  res.status(204).json({status:204});
+  return;
+})
+
+
+
+// /////////////////////////////////////////////////////////////////////
+// / Get budget code template
+// /////////////////////////////////////////////////////////////////////
+router.post('/callback/events', async (req, res) => {
+  // Best practice is to tell immediately that you got the call
+  // so return the HTTP call and proceed with the business logic
+  res.status(202).end();
+
+  if (req.body && req.body.hook && req.body.hook.event) {
+
+    const params = req.body.hook.event.replace(CostEventVersion, '').split('.');
+    const eventObject = params[0];
+    const eventAction = params[params.length - 1];
+
+    // send the event object to client
+    const costEventInfo = {
+      'CostObject': eventObject,
+      'CostAction': eventAction
+    };
+    global.MyApp.SocketIo.emit(SocketEnum.COST_EVENTS, costEventInfo);
+  }
 })
 
 

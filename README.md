@@ -8,6 +8,7 @@
 [![ACC](https://img.shields.io/badge/ACC-v1-green.svg)](http://developer.autodesk.com/)
 [![BIM-360](https://img.shields.io/badge/BIM%20360-v1-green.svg)](http://developer.autodesk.com/)
 [![Cost Management](https://img.shields.io/badge/Cost%20Management-v1%20-green.svg)](http://developer.autodesk.com/)
+[![Cost Webhooks](https://img.shields.io/badge/Cost%20Webhooks-v1-green.svg)](http://developer.autodesk.com/)
 
 [![MIT](https://img.shields.io/badge/License-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 [![Level](https://img.shields.io/badge/Level-Intermediate-blue.svg)](http://developer.autodesk.com/)
@@ -18,9 +19,12 @@ This sample demonstrates exchanging properties of Budget, Contract, Cost item an
 1. Display Cost properties either in **Raw data** and **Human readable form**.
 2. Export Cost properties either in **Raw data** and **Human readable form** to a CSV file.
 3. Import Cost properties from a locally stored CSV file(based on **Raw data**).
+4. The sample supported the Cost Webhook events, you can register/unregister cost webhook events by right clicking on the project node, if the cost webhook events are registered, the tab name will be appended with * (**BUDGET*** for example) whenever the related cost object is created/updated/deleted.
+
 
 ## Thumbnail
-![thumbnail](/thumbnail.png)  
+![thumbnail](/thumbnail_1.png)  
+![thumbnail](/thumbnail_2.png)  
 
 ## Demonstration
 [![https://youtu.be/X6mFX_yqhTI](http://img.youtube.com/vi/X6mFX_yqhTI/0.jpg)](https://youtu.be/X6mFX_yqhTI "Display and exchange cost information with CSV file")
@@ -59,6 +63,7 @@ Mac OSX/Linux (Terminal)
     export APS_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
     export APS_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
     export APS_CALLBACK_URL=<<YOUR CALLBACK URL>>
+    export APS_CALLBACK_COST_EVENTS=<<YOUR CALLBACK COST EVENTS URL>>
 
     npm start
 
@@ -68,6 +73,7 @@ Windows (use **Node.js command line** from Start menu)
     set APS_CLIENT_ID=<<YOUR CLIENT ID FROM DEVELOPER PORTAL>>
     set APS_CLIENT_SECRET=<<YOUR CLIENT SECRET>>
     set APS_CALLBACK_URL=<<YOUR CALLBACK URL>>
+    set APS_CALLBACK_COST_EVENTS=<<YOUR CALLBACK COST EVENTS URL>>
 
     npm start
 
@@ -85,6 +91,8 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 1. Select a project and display Cost properties either in **Raw data** and **Human readable form**.
 2. Click **Export** button to export Cost properties either in **Raw data** and **Human readable form** to a CSV file.
 3. Click **Import** button to update Cost properties from a locally stored CSV file(based on **Raw data**).
+4. Right click on the project node, register/unregister all cost webhook events for this project.
+5. If the cost webhook events are registered, you will see the tab name be appended with * (**BUDGET*** for example)  whenever the related cost object is created/updated/deleted, you can refresh to check the latest info.
 
 
 ## Limitation
