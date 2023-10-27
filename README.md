@@ -5,8 +5,9 @@
 ![Platforms](https://img.shields.io/badge/Web-Windows%20%7C%20MacOS%20%7C%20Linux-lightgray.svg)
 [![Data-Management](https://img.shields.io/badge/Data%20Management-v1-green.svg)](http://developer.autodesk.com/)
 
-[![ACC](https://img.shields.io/badge/ACC-v1-green.svg)](http://developer.autodesk.com/)
+[![OAuth2](https://img.shields.io/badge/OAuth2-v2-green.svg)](http://developer.autodesk.com/)
 [![BIM-360](https://img.shields.io/badge/BIM%20360-v1-green.svg)](http://developer.autodesk.com/)
+[![ACC](https://img.shields.io/badge/ACC-v1-green.svg)](http://developer.autodesk.com/)
 [![Cost Management](https://img.shields.io/badge/Cost%20Management-v1%20-green.svg)](http://developer.autodesk.com/)
 [![Cost Webhooks](https://img.shields.io/badge/Cost%20Webhooks-v1-green.svg)](http://developer.autodesk.com/)
 

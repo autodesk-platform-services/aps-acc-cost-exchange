@@ -73,14 +73,6 @@ async function getProjects(hubId, oauthClient, credentials, res) {
     const data = await projects.getHubProjects(hubId, {}, oauthClient, credentials);
     const treeNodes = data.body.data.map((project) => {
         let projectType = 'projects';
-        // switch (project.attributes.extension.type) {
-        //     case 'projects:autodesk.core:Project':
-        //         projectType = 'a360projects';
-        //         break;
-        //     case 'projects:autodesk.bim360:Project':
-        //         projectType = 'bim360projects';
-        //         break;
-        // }
         switch (project.attributes.extension.type) {
             case 'projects:autodesk.core:Project':
                 return null;
