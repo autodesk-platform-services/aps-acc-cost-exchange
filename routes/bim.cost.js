@@ -24,6 +24,11 @@ var router = express.Router();
 
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json(); 
+
+const crypto = require('crypto');
+
+// const { createHmac } = require('node:crypto');
+
 var config = require('../config'); 
 
 const { apiClientCallAsync } = require('./common/apiclient');
@@ -76,11 +81,24 @@ const TokenType = {
   NOT_SUPPORTED: 9
 }
 
+const WEBHOOKS_SECRET = "autodesktoken";
+
+function verifySignature(req, res, buf, encoding) {
+  const signature = req.header('x-adsk-signature');
+  if (!signature) { return; }
+
+  // use utf-8 encoding by default
+  const body = buf.toString(encoding);
+  const hmac = crypto.createHmac('sha1', WEBHOOKS_SECRET);
+  const calcSignature = 'sha1hash=' + hmac.update(body).digest('hex');
+  req.signature_match = (calcSignature === signature);
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 /// Middleware for obtaining a token for each request.
 ///////////////////////////////////////////////////////////////////////
-router.use(async (req, res, next) => {
+router.use( async (req, res, next) => {
   const oauth = new OAuth(req.session);
   req.oauth_client = oauth.getClient();
   req.oauth_token = await oauth.getInternalToken();  
@@ -433,10 +451,18 @@ router.delete('/project/:projectId/cost/events', jsonParser, async function (req
 // /////////////////////////////////////////////////////////////////////
 // / Get budget code template
 // /////////////////////////////////////////////////////////////////////
-router.post('/callback/events', async (req, res) => {
-  // Best practice is to tell immediately that you got the call
-  // so return the HTTP call and proceed with the business logic
-  res.status(202).end();
+router.post('/callback/events', express.json({
+  inflate: true,
+  limit: '1024kb',
+  type: 'application/json',
+  verify: verifySignature
+}), async (req, res) => {
+  
+  if(!req.signature_match) {
+    return res.status(403).send('not called from webhooks service');
+  }
+
+  res.status(204).send();
 
   if (req.body && req.body.hook && req.body.hook.event) {
 

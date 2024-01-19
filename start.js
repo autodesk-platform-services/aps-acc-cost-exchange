@@ -36,7 +36,6 @@ app.use(cookieSession({
     keys: ['aps_secure_key'],
     maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days, same as refresh token
 }));
-app.use(express.json({ limit: '50mb' }));
 app.use('/api/aps', require('./routes/oauth'));
 app.use('/api/aps', require('./routes/datamanagement'));
 app.use('/api/aps', require('./routes/user'));
