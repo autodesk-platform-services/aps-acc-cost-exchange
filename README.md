@@ -1,4 +1,4 @@
-# ACC Cost Exchange Sample
+# Forma Cost Exchange Sample
 
 [![Node.js](https://img.shields.io/badge/Node.js-14.0-blue.svg)](https://nodejs.org/)
 [![npm](https://img.shields.io/badge/npm-6.0-blue.svg)](https://www.npmjs.com/)
@@ -7,7 +7,7 @@
 
 [![OAuth2](https://img.shields.io/badge/OAuth2-v2-green.svg)](http://developer.autodesk.com/)
 [![BIM-360](https://img.shields.io/badge/BIM%20360-v1-green.svg)](http://developer.autodesk.com/)
-[![ACC](https://img.shields.io/badge/ACC-v1-green.svg)](http://developer.autodesk.com/)
+[![Forma](https://img.shields.io/badge/Forma-v1-green.svg)](http://developer.autodesk.com/)
 [![Cost Management](https://img.shields.io/badge/Cost%20Management-v1%20-green.svg)](http://developer.autodesk.com/)
 [![Cost Webhooks](https://img.shields.io/badge/Cost%20Webhooks-v1-green.svg)](http://developer.autodesk.com/)
 
@@ -35,8 +35,8 @@ This sample demonstrates exchanging properties of Budget, Contract, Cost item an
 ## Prerequisites
 
 1. **APS Account**: Learn how to create an APS Account, activate subscription and create an app at [this tutorial](http://aps.autodesk.com/tutorials). 
-2. **ACC|BIM360 Account**: must be Account Admin to add the app integration. [Learn about provisioning](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). 
-3. **Cost Management**: Create ACC|BIM360 project, activate Cost Management module, setup project to create **Budget Code Template** for Cost Management according to [the guide](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
+2. **Autodesk Forma Account**: must be Hub Admin to add the app integration. [Learn about provisioning](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). 
+3. **Cost Management**: Create Forma project, activate Cost Management module, setup project to create **Budget Code Template** for Cost Management according to [the guide](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
 4. **Node.js**: basic knowledge with [**Node.js**](https://nodejs.org/en/).
 5. **JavaScript** basic knowledge with **jQuery**
 
@@ -85,7 +85,7 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 **Please watch the [Video](https://youtu.be/X6mFX_yqhTI) for the detail setup and usage, or follow the steps:**
 
 - **Setup the app before using the App**
-1. Make sure to [Create ACC|BIM360 project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html).
+1. Make sure to [Create Autodesk Forma project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html).
 
 
 - **Operate with App after setup**
@@ -97,7 +97,7 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 
 
 ## Limitation
-- Cost Management module needs to be activated before using this app, due to the current limitation of Cost API, user needs to activate & setup cost project manually. Please check [Create ACC|BIM360 project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html) for details.
+- Cost Management module needs to be activated before using this app, due to the current limitation of Cost API, user needs to activate & setup cost project manually. Please check [Create Autodesk Forma project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html) for details.
 
 
 ## Known issues
@@ -111,17 +111,17 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 2. To import properties from CSV file, the suggested way is to export a CSV file of **raw data** first, update the editable properties within the file, then import it back to cost module.
 
 ## Troubleshooting
-1. **Cannot see my ACC projects**: Make sure to provision the APS App Client ID within the ACC Account, [learn more here](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). This requires the Account Admin permission.
+1. **Cannot see my Forma projects**: Make sure to provision the APS App Client ID within the ACC Account, [learn more here](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). This requires the Hub Admin permission.
  
 ## Further Reading
 **Document**:
 - [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview/)
 - [BIM360 API](https://developer.autodesk.com/en/docs/bim360/v1/overview/) and [App Provisioning](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps)
 - [Cost Management API](https://aps.autodesk.com/en/docs/bim360/v1/overview/field-guide/cost-management/)
-- [Create ACC|BIM360 project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
+- [Create Autodesk Forma project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
 
 **Tutorials**:
-- [View ACC Models](https://tutorials.autodesk.io/tutorials/hubs-browser/)
+- [View Forma Models](https://tutorials.autodesk.io/tutorials/hubs-browser/)
 
 **Blogs**:
 - [APS Blog](https://aps.autodesk.com/categories/bim-360-api)
