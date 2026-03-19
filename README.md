@@ -121,7 +121,7 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 - [Create Autodesk Forma project, activate Cost Management module, setup project for Cost Management](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
 
 **Tutorials**:
-- [View Forma Models](https://tutorials.autodesk.io/tutorials/hubs-browser/)
+- [View Forma Models](https://tutorials.autodesk.io/tutorials/hubs-browser)
 
 **Blogs**:
 - [APS Blog](https://aps.autodesk.com/categories/bim-360-api)
