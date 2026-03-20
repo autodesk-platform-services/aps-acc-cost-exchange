@@ -35,7 +35,7 @@ This sample demonstrates exchanging properties of Budget, Contract, Cost item an
 ## Prerequisites
 
 1. **APS Account**: Learn how to create an APS Account, activate subscription and create an app at [this tutorial](http://aps.autodesk.com/tutorials). 
-2. **Autodesk Forma Account**: must be Hub Admin to add the app integration. [Learn about provisioning](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). 
+2. **Autodesk Forma Hub**: must be Hub Admin to add the app integration. [Learn about provisioning](https://aps.autodesk.com/blog/bim-360-docs-provisioning-forge-apps). 
 3. **Cost Management**: Create Forma project, activate Cost Management module, setup project to create **Budget Code Template** for Cost Management according to [the guide](https://help.autodesk.com/view/BIM360D/ENU/?guid=BIM360D_Cost_Management_getting_started_with_cost_management_html)
 4. **Node.js**: basic knowledge with [**Node.js**](https://nodejs.org/en/).
 5. **JavaScript** basic knowledge with **jQuery**
